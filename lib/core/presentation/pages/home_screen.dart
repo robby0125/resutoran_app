@@ -1,10 +1,16 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 import 'package:resutoran_app/core/data/models/restaurant_model.dart';
 import 'package:resutoran_app/core/domain/entities/restaurant_entity.dart';
 import 'package:resutoran_app/core/presentation/provider/restaurant_provider.dart';
+import 'package:resutoran_app/core/presentation/pages/user_login_screen.dart';
+import 'package:resutoran_app/util/helper.dart';
 
 class HomeScreen extends StatefulWidget {
+  static const routeName = '/home';
+
   @override
   _HomeScreenState createState() => _HomeScreenState();
 }
@@ -15,6 +21,15 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Home'),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.person),
+            onPressed: () {
+              print(Get.locale);
+              Get.toNamed(UserLoginScreen.routeName);
+            },
+          ),
+        ],
       ),
       body: StreamBuilder<List<RestaurantEntity>>(
         stream: Provider.of<RestaurantProvider>(context)
@@ -26,18 +41,21 @@ class _HomeScreenState extends State<HomeScreen> {
               child: CircularProgressIndicator(),
             );
           } else {
-            // List<Restaurant> _restaurants = snapshot.core.data.docs
-            //     .map((e) => Restaurant.fromJson(e.core.data()))
-            //     .toList();
+            List<RestaurantModel> _restaurants = snapshot.data;
 
-            return Container(
-              margin: EdgeInsets.symmetric(
+            return ListView.separated(
+              itemBuilder: (context, index) {
+                return RestaurantItem(
+                  restaurant: _restaurants[index],
+                );
+              },
+              separatorBuilder: (context, index) {
+                return SizedBox(height: 4);
+              },
+              itemCount: _restaurants.length,
+              padding: EdgeInsets.symmetric(
                 horizontal: 16,
                 vertical: 8,
-              ),
-              child: Text(
-                (snapshot.data.first as RestaurantModel).toMap().toString().replaceAll(', ', '\n'),
-                style: Theme.of(context).textTheme.headline4,
               ),
             );
           }
@@ -48,6 +66,10 @@ class _HomeScreenState extends State<HomeScreen> {
 }
 
 class RestaurantItem extends StatelessWidget {
+  final RestaurantModel restaurant;
+
+  const RestaurantItem({@required this.restaurant});
+
   @override
   Widget build(BuildContext context) {
     return Card(
@@ -60,14 +82,16 @@ class RestaurantItem extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Container(
+          Image.network(
+            restaurant.pictures,
+            width: double.infinity,
             height: 200,
-            color: Colors.grey,
+            fit: BoxFit.cover,
           ),
           ListTile(
             minVerticalPadding: 8,
             title: Text(
-              'Restaurant Name',
+              restaurant.name,
               style: Theme.of(context).textTheme.headline6,
             ),
             subtitle: Column(
@@ -75,33 +99,28 @@ class RestaurantItem extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 SizedBox(height: 8),
-                Text(
-                  'Restaurant Description',
-                  style: Theme.of(context).textTheme.bodyText1,
-                  maxLines: 3,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                SizedBox(height: 8),
                 Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Icon(Icons.location_on),
-                    Text('City'),
+                    FutureBuilder(
+                      future: Helper.getCityFromLatLong(restaurant.location),
+                      builder: (context, snapshot) {
+                        String _data = snapshot.data ?? 'Loading City...';
+                        return Text(_data);
+                      },
+                    ),
                     SizedBox(width: 16),
                     Icon(Icons.star_rate_rounded),
-                    Text('5.0'),
+                    Text(restaurant.rating.toString()),
                   ],
                 ),
               ],
             ),
-            trailing: Container(
-              height: double.infinity,
-              child: IconButton(
-                onPressed: () {},
-                icon: Icon(Icons.favorite),
-              ),
+            trailing: IconButton(
+              onPressed: () {},
+              icon: Icon(Icons.favorite),
             ),
-            isThreeLine: true,
           ),
         ],
       ),
