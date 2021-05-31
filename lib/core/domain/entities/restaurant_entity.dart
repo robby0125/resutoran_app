@@ -1,25 +1,21 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
+abstract class RestaurantEntity {
+  String get name;
 
-class RestaurantEntity {
-  final String name;
-  final String description;
-  final String pictures;
-  final double rating;
-  final GeoPoint location;
-  final List<int> categoryIds;
-  final List<Map<String, dynamic>> drinks;
-  final List<Map<String, dynamic>> foods;
-  final List<Map<String, dynamic>> reviews;
+  String get description;
 
-  RestaurantEntity({
-    this.name,
-    this.description,
-    this.rating,
-    this.location,
-    this.categoryIds,
-    this.drinks,
-    this.foods,
-    this.pictures,
-    this.reviews,
-  });
+  String get pictures;
+
+  double get rating;
+
+  double get latitude;
+
+  double get longitude;
+
+  List<int> get categoryIds;
+
+  List<Map<String, dynamic>> get drinks;
+
+  List<Map<String, dynamic>> get foods;
+
+  List<Map<String, dynamic>> get reviews;
 }

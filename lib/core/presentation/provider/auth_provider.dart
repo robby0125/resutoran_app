@@ -1,89 +1,89 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
+import 'package:resutoran_app/core/domain/entities/user_entity.dart';
+import 'package:resutoran_app/core/domain/resource.dart';
+import 'package:resutoran_app/core/domain/usecases/auth_usecase.dart';
 import 'package:resutoran_app/core/presentation/pages/home_screen.dart';
 
 class AuthProvider extends ChangeNotifier {
-  final _firebaseAuth = FirebaseAuth.instance;
+  final AuthUseCase _authUseCase;
+
+  AuthProvider(this._authUseCase);
 
   ConnectionState _state;
 
   ConnectionState get state => _state;
 
-  User _user;
+  UserEntity _user;
 
-  User get user => _user;
+  UserEntity get user => _user;
 
-  Future<void> login({
-    @required String email,
-    @required String password,
-  }) async {
-    try {
-      _state = ConnectionState.waiting;
-      notifyListeners();
+  Future<void> loginWithEmail(
+    String email,
+    String pass,
+  ) async {
+    _state = ConnectionState.waiting;
+    notifyListeners();
 
-      final _user = await _firebaseAuth.signInWithEmailAndPassword(
-        email: email,
-        password: password,
-      );
+    final _resource = await _authUseCase.loginWithEmail(
+      email,
+      pass,
+    );
 
-      if (_user != null) {
-        _state = ConnectionState.done;
-        notifyListeners();
-
-        this._user = _user.user;
-
-        Get.offAllNamed(HomeScreen.routeName);
-      }
-    } on FirebaseAuthException catch (e) {
-      _state = ConnectionState.none;
-      notifyListeners();
-
-      if (e.code == 'user-not-found') {
-        Get.defaultDialog(
-          content: Text(
-            'User tidak ditemukan, silahkan mendaftar terlebih dahulu.',
-            textAlign: TextAlign.center,
-          ),
-        );
-      } else if (e.code == 'wrong-password') {
-        Get.defaultDialog(
-          content: Text(
-            'Password salah',
-            textAlign: TextAlign.center,
-          ),
-        );
-      }
-    }
+    _handleResult(_resource);
   }
 
-  Future<void> register({
-    @required String email,
-    @required String password,
-    @required String name,
-  }) async {
-    try {
-      _state = ConnectionState.waiting;
+  Future<void> registerWithEmail(
+    String name,
+    String email,
+    String pass,
+  ) async {
+    _state = ConnectionState.waiting;
+    notifyListeners();
+
+    final _resource = await _authUseCase.registerWithEmail(
+      name,
+      email,
+      pass,
+    );
+
+    _handleResult(_resource);
+  }
+
+  Future<void> loginWithFacebook() async {
+    _state = ConnectionState.waiting;
+    notifyListeners();
+
+    final _resource = await _authUseCase.loginWithFacebook();
+
+    _handleResult(_resource);
+  }
+
+  Future<void> loginWithGoogle() async {
+    _state = ConnectionState.waiting;
+    notifyListeners();
+
+    final _resource = await _authUseCase.loginWithGoogle();
+
+    _handleResult(_resource);
+  }
+
+  void _handleResult(Resource<UserEntity> _resource) {
+    if (_resource.body != null) {
+      _state = ConnectionState.done;
       notifyListeners();
 
-      final _user = await _firebaseAuth.createUserWithEmailAndPassword(
-        email: email,
-        password: password,
-      );
+      _user = _resource.body;
 
-      if (_user != null) {
-        _state = ConnectionState.done;
-        notifyListeners();
-
-        this._user = _user.user;
-        this._user.updateProfile(displayName: name);
-
-        login(email: email, password: password);
-      }
-    } on FirebaseAuthException catch (e) {
+      Get.offAllNamed(HomeScreen.routeName);
+    } else {
       _state = ConnectionState.none;
       notifyListeners();
+
+      Get.defaultDialog(
+        content: Text(_resource.message),
+      );
     }
   }
 }

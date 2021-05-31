@@ -217,10 +217,7 @@ class _UserLoginScreenState extends State<UserLoginScreen>
                                       String _password =
                                           _passwordController.text.trim();
 
-                                      auth.login(
-                                        email: _email,
-                                        password: _password,
-                                      );
+                                      auth.loginWithEmail(_email, _password);
                                     }
                                   },
                                   child: Text(
@@ -237,7 +234,8 @@ class _UserLoginScreenState extends State<UserLoginScreen>
                                 ),
                                 SizedBox(height: 4),
                                 TextButton(
-                                  onPressed: () => Get.toNamed(UserRegisterScreen.routeName),
+                                  onPressed: () =>
+                                      Get.toNamed(UserRegisterScreen.routeName),
                                   child: Text(
                                     'DAFTAR',
                                     style: Theme.of(context)
@@ -280,18 +278,25 @@ class _UserLoginScreenState extends State<UserLoginScreen>
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
                                     CircleAvatar(
-                                      child: Icon(
-                                        FontAwesomeIcons.facebookF,
-                                        color: Colors.white,
+                                      child: IconButton(
+                                        icon: FaIcon(
+                                          FontAwesomeIcons.facebookF,
+                                          color: Colors.white,
+                                        ),
+                                        onPressed: () =>
+                                            auth.loginWithFacebook(),
                                       ),
                                       backgroundColor:
                                           Theme.of(context).primaryColor,
                                     ),
                                     SizedBox(width: 16),
                                     CircleAvatar(
-                                      child: Icon(
-                                        FontAwesomeIcons.google,
-                                        color: Colors.white,
+                                      child: IconButton(
+                                        icon: FaIcon(
+                                          FontAwesomeIcons.google,
+                                          color: Colors.white,
+                                        ),
+                                        onPressed: () => auth.loginWithGoogle(),
                                       ),
                                       backgroundColor:
                                           Theme.of(context).primaryColor,

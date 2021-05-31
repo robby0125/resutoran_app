@@ -26,6 +26,14 @@ apply plugin: 'kotlin-android'
 apply from: "$flutterRoot/packages/flutter_tools/gradle/flutter.gradle"
 
 android {
+    signingConfigs {
+        debug {
+            storeFile file('C:\\Project\\PersonalProject\\bulbadev.jks')
+            storePassword 'bulba123'
+            keyPassword 'bulba123'
+            keyAlias 'bulbadev'
+        }
+    }
     compileSdkVersion 30
 
     sourceSets {

@@ -173,10 +173,10 @@ class _UserRegisterScreenState extends State<UserRegisterScreen> {
                                             String _password =
                                                 _passwordController.text.trim();
 
-                                            auth.register(
-                                              email: _email,
-                                              password: _password,
-                                              name: _name,
+                                            auth.registerWithEmail(
+                                              _name,
+                                              _email,
+                                              _password,
                                             );
                                           }
                                         },

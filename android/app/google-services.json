@@ -14,6 +14,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "136436826992-d30uk67um7dmv3in87nlv88s19g6aeft.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.robby.resutoran_app",
+            "certificate_hash": "1a1c52916c7e80b61ad9563569856e32282d5ece"
+          }
+        },
+        {
           "client_id": "136436826992-s895n5cg7tvibg4j8otldfq3rn203aem.apps.googleusercontent.com",
           "client_type": 3
         }

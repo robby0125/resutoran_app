@@ -4,11 +4,11 @@ import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 import 'package:responsive_framework/responsive_framework.dart';
 import 'package:resutoran_app/core/di/injection.dart';
-import 'package:resutoran_app/core/presentation/provider/auth_provider.dart';
-import 'package:resutoran_app/core/presentation/provider/restaurant_provider.dart';
 import 'package:resutoran_app/core/presentation/pages/home_screen.dart';
 import 'package:resutoran_app/core/presentation/pages/user_login_screen.dart';
 import 'package:resutoran_app/core/presentation/pages/user_register_screen.dart';
+import 'package:resutoran_app/core/presentation/provider/auth_provider.dart';
+import 'package:resutoran_app/core/presentation/provider/restaurant_provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -23,10 +23,10 @@ class Resutoran extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(
-          create: (_) => Injection.getIt<RestaurantProvider>(),
+          create: (_) => Get.find<RestaurantProvider>(),
         ),
         ChangeNotifierProvider(
-          create: (_) => AuthProvider(),
+          create: (_) => Get.find<AuthProvider>(),
         ),
       ],
       child: GetMaterialApp(

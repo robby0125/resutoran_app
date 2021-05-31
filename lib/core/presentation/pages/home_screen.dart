@@ -1,11 +1,12 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 import 'package:resutoran_app/core/data/models/restaurant_model.dart';
 import 'package:resutoran_app/core/domain/entities/restaurant_entity.dart';
-import 'package:resutoran_app/core/presentation/provider/restaurant_provider.dart';
 import 'package:resutoran_app/core/presentation/pages/user_login_screen.dart';
+import 'package:resutoran_app/core/presentation/provider/restaurant_provider.dart';
 import 'package:resutoran_app/util/helper.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -104,7 +105,10 @@ class RestaurantItem extends StatelessWidget {
                   children: [
                     Icon(Icons.location_on),
                     FutureBuilder(
-                      future: Helper.getCityFromLatLong(restaurant.location),
+                      future: Helper.getCityFromLatLong(GeoPoint(
+                        restaurant.latitude,
+                        restaurant.longitude,
+                      )),
                       builder: (context, snapshot) {
                         String _data = snapshot.data ?? 'Loading City...';
                         return Text(_data);

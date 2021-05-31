@@ -1,5 +1,5 @@
-import 'package:resutoran_app/core/domain/entities/restaurant_entity.dart';
+import 'package:resutoran_app/core/data/models/restaurant_model.dart';
 
 abstract class RestaurantDataSource {
-  Stream<List<RestaurantEntity>> getAllRestaurants();
+  Stream<List<RestaurantModel>> getAllRestaurants();
 }
