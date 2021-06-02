@@ -3,9 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 import 'package:responsive_framework/responsive_framework.dart';
+import 'package:resutoran_app/common/style.dart';
 import 'package:resutoran_app/core/di/injection.dart';
-import 'package:resutoran_app/core/presentation/pages/home_screen.dart';
+import 'package:resutoran_app/core/presentation/pages/detail_screen.dart';
 import 'package:resutoran_app/core/presentation/pages/login_screen.dart';
+import 'package:resutoran_app/core/presentation/pages/main_screen.dart';
 import 'package:resutoran_app/core/presentation/pages/register_screen.dart';
 import 'package:resutoran_app/core/presentation/provider/auth_provider.dart';
 import 'package:resutoran_app/core/presentation/provider/restaurant_provider.dart';
@@ -32,24 +34,32 @@ class Resutoran extends StatelessWidget {
       child: GetMaterialApp(
         title: 'Resutoran',
         theme: ThemeData(
-          primaryColor: Color(0xFFFD9228),
+          primaryColor: Style.primaryColor,
+          textTheme: Style.textTheme,
+          appBarTheme: AppBarTheme(
+            backgroundColor: Colors.white,
+            elevation: 0,
+          ),
         ),
         builder: (context, widget) => ResponsiveWrapper.builder(
           BouncingScrollWrapper.builder(context, widget),
-          maxWidth: 1200,
-          minWidth: 450,
+          maxWidth: 1280,
+          minWidth: 480,
           defaultScale: true,
           breakpoints: [
-            ResponsiveBreakpoint.resize(450, name: MOBILE),
-            ResponsiveBreakpoint.autoScale(800, name: TABLET),
-            ResponsiveBreakpoint.resize(1000, name: TABLET),
+            ResponsiveBreakpoint.resize(480),
+            ResponsiveBreakpoint.autoScale(800),
+            ResponsiveBreakpoint.resize(1280),
           ],
         ),
-        initialRoute: HomeScreen.routeName,
+        initialRoute: MainScreen.routeName,
         routes: {
-          HomeScreen.routeName: (_) => HomeScreen(),
+          MainScreen.routeName: (_) => MainScreen(),
           LoginScreen.routeName: (_) => LoginScreen(),
           RegisterScreen.routeName: (_) => RegisterScreen(),
+          DetailScreen.routeName: (context) => DetailScreen(
+                restaurant: ModalRoute.of(context).settings.arguments,
+              ),
         },
       ),
     );

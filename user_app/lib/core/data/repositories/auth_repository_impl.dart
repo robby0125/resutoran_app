@@ -30,4 +30,7 @@ class AuthRepositoryImpl implements AuthRepository {
     String pass,
   ) =>
       _authDataSource.registerWithEmail(name, email, pass);
+
+  @override
+  Future<void> signOut() => _authDataSource.signOut();
 }

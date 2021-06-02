@@ -1,275 +1,195 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 import 'package:resutoran_app/core/data/models/restaurant_model.dart';
-import 'package:resutoran_app/core/domain/entities/restaurant_entity.dart';
-import 'package:resutoran_app/core/presentation/pages/login_screen.dart';
-import 'package:resutoran_app/core/presentation/provider/auth_provider.dart';
+import 'package:resutoran_app/core/presentation/pages/detail_screen.dart';
 import 'package:resutoran_app/core/presentation/provider/restaurant_provider.dart';
 import 'package:resutoran_app/util/helper.dart';
 
-class HomeScreen extends StatefulWidget {
-  static const routeName = '/home';
-
-  @override
-  _HomeScreenState createState() => _HomeScreenState();
-}
-
-class _HomeScreenState extends State<HomeScreen> {
+class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Consumer<AuthProvider>(
-      builder: (context, auth, _) => Scaffold(
-        appBar: AppBar(
-          title: Text('Beranda'),
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(
+          'Beranda',
+          style: Theme.of(context).textTheme.headline5,
         ),
-        drawer: Drawer(
-          child: auth.user != null
-              ? Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    DrawerHeader(
-                      decoration: BoxDecoration(
-                        image: DecorationImage(
-                          image: AssetImage('images/drawer_header_bg.jpg'),
-                          fit: BoxFit.cover,
-                          colorFilter: ColorFilter.mode(
-                            Colors.black.withAlpha(150),
-                            BlendMode.darken,
-                          ),
-                        ),
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          CircleAvatar(
-                            radius: 30,
-                            backgroundColor: Colors.red,
-                            backgroundImage: NetworkImage(
-                              auth.user != null
-                                  ? auth.user.photoUrl
-                                  : 'https://cdn.pixabay.com/photo/2016/08/08/09/17/avatar-1577909_1280.png',
-                            ),
-                          ),
-                          SizedBox(height: 16),
-                          Text(
-                            auth.user != null
-                                ? auth.user.displayName
-                                : 'User Name',
-                            style:
-                                Theme.of(context).textTheme.subtitle1.copyWith(
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.white,
-                                    ),
-                          ),
-                          SizedBox(height: 4),
-                          Text(
-                            auth.user != null ? auth.user.email : 'User Email',
-                            style: Theme.of(context)
-                                .textTheme
-                                .bodyText2
-                                .copyWith(color: Colors.white),
-                          ),
-                        ],
-                      ),
-                    ),
-                    ListTile(
-                      leading: FaIcon(
-                        FontAwesomeIcons.home,
-                        color: Theme.of(context).primaryColor,
-                      ),
-                      title: Text('Beranda'),
-                    ),
-                    ListTile(
-                      leading: FaIcon(
-                        FontAwesomeIcons.solidHeart,
-                        color: Colors.pinkAccent,
-                      ),
-                      title: Text('Favorit Saya'),
-                    ),
-                    ListTile(
-                      leading: FaIcon(
-                        FontAwesomeIcons.userCog,
-                        color: Colors.lightBlue,
-                      ),
-                      title: Text('Pengaturan Profil'),
-                    ),
-                    Expanded(child: Material()),
-                    Divider(thickness: 2),
-                    ListTile(
-                      leading: FaIcon(
-                        FontAwesomeIcons.signOutAlt,
-                        color: Colors.red,
-                      ),
-                      title: Text('Keluar'),
-                    ),
-                  ],
-                )
-              : Stack(
-                  fit: StackFit.expand,
-                  children: [
-                    ColorFiltered(
-                      colorFilter: ColorFilter.mode(
-                        Colors.black.withAlpha(150),
-                        BlendMode.darken,
-                      ),
-                      child: Image.asset(
-                        'images/auth_background.jpg',
-                        fit: BoxFit.cover,
-                      ),
-                    ),
-                    Padding(
-                      padding: EdgeInsets.all(16),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            'Belum ada akun yang terhubung, silahkan masuk/daftar akun terlebih dahulu.',
-                            textAlign: TextAlign.center,
-                            style: Theme.of(context)
-                                .textTheme
-                                .subtitle1
-                                .copyWith(color: Colors.white),
-                          ),
-                          SizedBox(height: 16),
-                          TextButton(
-                            onPressed: () =>
-                                Get.toNamed(LoginScreen.routeName),
-                            style: ButtonStyle(
-                              backgroundColor: MaterialStateProperty.all(
-                                Theme.of(context).primaryColor,
-                              ),
-                              overlayColor: MaterialStateProperty.all(
-                                Colors.black.withAlpha(50),
-                              ),
-                              padding: MaterialStateProperty.all(
-                                EdgeInsets.symmetric(
-                                  horizontal: 48,
-                                  vertical: 16,
-                                ),
-                              ),
-                              shape: MaterialStateProperty.all(
-                                RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.all(
-                                    Radius.circular(25),
-                                  ),
-                                ),
-                              ),
-                              elevation: MaterialStateProperty.all(2),
-                            ),
-                            child: Text(
-                              'Masuk',
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .button
-                                  .copyWith(color: Colors.white),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-        ),
-        body: StreamBuilder<List<RestaurantEntity>>(
-          stream: Provider.of<RestaurantProvider>(context)
-              .restaurantUseCase
-              .getRestaurants(),
-          builder: (context, snapshot) {
-            if (!snapshot.hasData) {
-              return Center(
-                child: CircularProgressIndicator(),
-              );
-            } else {
-              List<RestaurantModel> _restaurants = snapshot.data;
+        actions: [
+          IconButton(
+            icon: Icon(FontAwesomeIcons.search),
+            onPressed: () {},
+          ),
+        ],
+      ),
+      body: StreamBuilder(
+        stream: Provider.of<RestaurantProvider>(context)
+            .restaurantUseCase
+            .getRestaurants(),
+        builder: (context, snapshot) {
+          if (snapshot.hasData) {
+            List<RestaurantModel> _listRestaurant = snapshot.data;
 
-              return ListView.separated(
-                itemBuilder: (context, index) {
-                  return RestaurantItem(
-                    restaurant: _restaurants[index],
-                  );
-                },
-                separatorBuilder: (context, index) {
-                  return SizedBox(height: 4);
-                },
-                itemCount: _restaurants.length,
-                padding: EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 8,
-                ),
-              );
-            }
-          },
-        ),
+            return SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Container(
+                    width: double.infinity,
+                    height: 280,
+                    child: Image.asset(
+                      'images/drawer_header_bg.jpg',
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                  ListTile(
+                    title: Text(
+                      'Restoran Populer',
+                      style: Theme.of(context)
+                          .textTheme
+                          .bodyText1
+                          .copyWith(fontWeight: FontWeight.bold),
+                    ),
+                    trailing: Text(
+                      'Lihat Semua',
+                      style: Theme.of(context).textTheme.bodyText2.copyWith(
+                            color: Colors.blueAccent,
+                            fontWeight: FontWeight.bold,
+                          ),
+                    ),
+                  ),
+                  Container(
+                    height: 196,
+                    child: ListView.separated(
+                      itemBuilder: (context, index) {
+                        var _restaurant = _listRestaurant[index];
+                        return MiniRestaurantCard(restaurant: _restaurant);
+                      },
+                      separatorBuilder: (context, index) {
+                        return SizedBox(width: 8);
+                      },
+                      itemCount: _listRestaurant.length > 1
+                          ? _listRestaurant.length
+                          : 1,
+                      scrollDirection: Axis.horizontal,
+                      padding: EdgeInsets.symmetric(horizontal: 16),
+                    ),
+                  ),
+                  ListTile(
+                    title: Text(
+                      'Restoran Terdekat',
+                      style: Theme.of(context)
+                          .textTheme
+                          .bodyText1
+                          .copyWith(fontWeight: FontWeight.bold),
+                    ),
+                    trailing: Text(
+                      'Lihat Semua',
+                      style: Theme.of(context).textTheme.bodyText2.copyWith(
+                            color: Colors.blueAccent,
+                            fontWeight: FontWeight.bold,
+                          ),
+                    ),
+                  ),
+                  Container(
+                    height: 196,
+                    child: ListView.separated(
+                      itemBuilder: (context, index) {
+                        var _restaurant = _listRestaurant[index];
+                        return MiniRestaurantCard(restaurant: _restaurant);
+                      },
+                      separatorBuilder: (context, index) {
+                        return SizedBox(width: 8);
+                      },
+                      itemCount: _listRestaurant.length > 1
+                          ? _listRestaurant.length
+                          : 1,
+                      scrollDirection: Axis.horizontal,
+                      padding: EdgeInsets.symmetric(horizontal: 16),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          } else {
+            return Center(
+              child: SpinKitFadingCircle(
+                size: 60,
+                color: Theme.of(context).primaryColor,
+              ),
+            );
+          }
+        },
       ),
     );
   }
 }
 
-class RestaurantItem extends StatelessWidget {
+class MiniRestaurantCard extends StatelessWidget {
   final RestaurantModel restaurant;
 
-  const RestaurantItem({@required this.restaurant});
+  MiniRestaurantCard({@required this.restaurant});
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.all(Radius.circular(8)),
+    return InkWell(
+      onTap: () => Get.toNamed(
+        DetailScreen.routeName,
+        arguments: restaurant,
       ),
-      clipBehavior: Clip.antiAliasWithSaveLayer,
-      elevation: 4,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Image.network(
-            restaurant.pictures,
-            width: double.infinity,
-            height: 200,
-            fit: BoxFit.cover,
-          ),
-          ListTile(
-            minVerticalPadding: 8,
-            title: Text(
-              restaurant.name,
-              style: Theme.of(context).textTheme.headline6,
-            ),
-            subtitle: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                SizedBox(height: 8),
-                Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(Icons.location_on),
-                    FutureBuilder(
-                      future: Helper.getCityFromLatLong(GeoPoint(
-                        restaurant.latitude,
-                        restaurant.longitude,
-                      )),
-                      builder: (context, snapshot) {
-                        String _data = snapshot.data ?? 'Loading City...';
-                        return Text(_data);
-                      },
-                    ),
-                    SizedBox(width: 16),
-                    Icon(Icons.star_rate_rounded),
-                    Text(restaurant.rating.toString()),
-                  ],
+      child: Card(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.all(Radius.circular(4)),
+        ),
+        clipBehavior: Clip.hardEdge,
+        child: Container(
+          width: 230,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Image.network(
+                restaurant.pictures,
+                width: double.infinity,
+                height: 130,
+                fit: BoxFit.cover,
+              ),
+              SizedBox(height: 4),
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 8),
+                child: Text(
+                  restaurant.name,
+                  style: Theme.of(context)
+                      .textTheme
+                      .headline5
+                      .copyWith(fontWeight: FontWeight.bold),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
-              ],
-            ),
-            trailing: IconButton(
-              onPressed: () {},
-              icon: Icon(Icons.favorite),
-            ),
+              ),
+              FutureBuilder(
+                future: Helper.getCityFromLatLong(GeoPoint(
+                  restaurant.latitude,
+                  restaurant.longitude,
+                )),
+                builder: (context, snapshot) => Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 8),
+                  child: Text(
+                    snapshot.data ?? 'Loading City',
+                    style: Theme.of(context)
+                        .textTheme
+                        .bodyText1
+                        .copyWith(color: Colors.black54),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }

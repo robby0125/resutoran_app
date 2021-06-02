@@ -16,4 +16,6 @@ abstract class AuthDataSource {
   Future<Resource<UserEntity>> loginWithFacebook();
 
   Future<Resource<UserEntity>> loginWithGoogle();
+
+  Future<void> signOut();
 }

@@ -78,7 +78,7 @@ class AuthDataSourceImpl implements AuthDataSource {
       }
 
       return _resource.failed('Terjadi kesalahan!');
-    } catch(e) {
+    } catch (e) {
       return _resource.failed(null);
     }
   }
@@ -106,6 +106,11 @@ class AuthDataSourceImpl implements AuthDataSource {
     }
 
     return _resource.failed('Terjadi kesalahan tak teridentifikasi.');
+  }
+
+  @override
+  Future<void> signOut() async {
+    await _firebaseAuth.signOut();
   }
 
   UserEntity _provideUser(User user) => UserEntity(

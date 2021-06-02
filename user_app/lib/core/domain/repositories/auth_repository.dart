@@ -16,4 +16,6 @@ abstract class AuthRepository {
   Future<Resource<UserEntity>> loginWithFacebook();
 
   Future<Resource<UserEntity>> loginWithGoogle();
+
+  Future<void> signOut();
 }

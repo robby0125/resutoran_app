@@ -6,6 +6,6 @@ class Helper {
     final _coord = Coordinates(location.latitude, location.longitude);
     final _address = await Geocoder.local.findAddressesFromCoordinates(_coord);
     final _cityName = _address.first.addressLine.split(',')[1];
-    return _cityName;
+    return _cityName.toString().trim();
   }
 }

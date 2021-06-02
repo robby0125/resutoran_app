@@ -4,7 +4,7 @@ import 'package:get/get.dart';
 import 'package:resutoran_app/core/domain/entities/user_entity.dart';
 import 'package:resutoran_app/core/domain/resource.dart';
 import 'package:resutoran_app/core/domain/usecases/auth_usecase.dart';
-import 'package:resutoran_app/core/presentation/pages/home_screen.dart';
+import 'package:resutoran_app/core/presentation/pages/main_screen.dart';
 
 class AuthProvider extends ChangeNotifier {
   final AuthUseCase _authUseCase;
@@ -50,8 +50,19 @@ class AuthProvider extends ChangeNotifier {
     _handleResult(_resource);
   }
 
+  Future<void> signOut() async {
+    await _authUseCase.signOut();
+    _user = null;
+    _failed();
+  }
+
   void _loading() {
     _state = ConnectionState.waiting;
+    notifyListeners();
+  }
+
+  void _failed() {
+    _state = ConnectionState.none;
     notifyListeners();
   }
 
@@ -62,10 +73,9 @@ class AuthProvider extends ChangeNotifier {
 
       _user = _resource.body;
 
-      Get.offAllNamed(HomeScreen.routeName);
+      Get.offAllNamed(MainScreen.routeName);
     } else {
-      _state = ConnectionState.none;
-      notifyListeners();
+      _failed();
 
       if (_resource.message != null) {
         Get.defaultDialog(

@@ -30,4 +30,7 @@ class AuthInteractor implements AuthUseCase {
     String pass,
   ) =>
       _authRepository.registerWithEmail(name, email, pass);
+
+  @override
+  Future<void> signOut() => _authRepository.signOut();
 }

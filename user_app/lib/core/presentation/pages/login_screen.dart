@@ -86,6 +86,7 @@ class _LoginScreenState extends State<LoginScreen>
       resizeToAvoidBottomInset: false,
       body: Consumer<AuthProvider>(
         builder: (context, auth, _) {
+          print(auth.state ?? 'nothing');
           return Stack(
             children: [
               ColorFiltered(
@@ -207,23 +208,20 @@ class _LoginScreenState extends State<LoginScreen>
                                   onPressed: () {
                                     if (_formKey.currentState.validate()) {
                                       String _email =
-                                          _emailController.text.trim();
+                                      _emailController.text.trim();
                                       String _password =
-                                          _passwordController.text.trim();
+                                      _passwordController.text.trim();
 
                                       auth.loginWithEmail(_email, _password);
                                     }
                                   },
                                   child: Text(
                                     'MASUK',
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .button
-                                        .copyWith(color: Colors.white),
+                                    style: Theme.of(context).textTheme.button,
                                   ),
                                   style: _loginFormButtonStyle(
                                     backgroundColor:
-                                        Theme.of(context).primaryColor,
+                                    Theme.of(context).primaryColor,
                                   ),
                                 ),
                                 SizedBox(height: 4),
@@ -232,12 +230,7 @@ class _LoginScreenState extends State<LoginScreen>
                                       Get.toNamed(RegisterScreen.routeName),
                                   child: Text(
                                     'DAFTAR',
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .button
-                                        .copyWith(
-                                          color: Theme.of(context).primaryColor,
-                                        ),
+                                    style: Theme.of(context).textTheme.button,
                                   ),
                                   style: _loginFormButtonStyle(),
                                 ),
@@ -273,27 +266,22 @@ class _LoginScreenState extends State<LoginScreen>
                                   children: [
                                     CircleAvatar(
                                       child: IconButton(
-                                        icon: FaIcon(
-                                          FontAwesomeIcons.facebookF,
-                                          color: Colors.white,
-                                        ),
+                                        icon:
+                                            FaIcon(FontAwesomeIcons.facebookF),
                                         onPressed: () =>
                                             auth.loginWithFacebook(),
                                       ),
                                       backgroundColor:
-                                          Theme.of(context).primaryColor,
+                                      Theme.of(context).primaryColor,
                                     ),
                                     SizedBox(width: 16),
                                     CircleAvatar(
                                       child: IconButton(
-                                        icon: FaIcon(
-                                          FontAwesomeIcons.google,
-                                          color: Colors.white,
-                                        ),
+                                        icon: FaIcon(FontAwesomeIcons.google),
                                         onPressed: () => auth.loginWithGoogle(),
                                       ),
                                       backgroundColor:
-                                          Theme.of(context).primaryColor,
+                                      Theme.of(context).primaryColor,
                                     ),
                                   ],
                                 ),
