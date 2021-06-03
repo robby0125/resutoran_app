@@ -2,36 +2,70 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 import 'package:resutoran_app/core/data/models/restaurant_model.dart';
 import 'package:resutoran_app/core/presentation/pages/detail_screen.dart';
-import 'package:resutoran_app/core/presentation/provider/restaurant_provider.dart';
+import 'package:resutoran_app/core/presentation/pages/search_result_screen.dart';
+import 'package:resutoran_app/core/presentation/providers/restaurant_provider.dart';
 import 'package:resutoran_app/util/helper.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
+  @override
+  _HomeScreenState createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  bool _searchMode = false;
+  List<RestaurantModel> _restaurants;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          'Beranda',
-          style: Theme.of(context).textTheme.headline5,
-        ),
+        title: _searchMode
+            ? TextFormField(
+                autofocus: _searchMode,
+                decoration: InputDecoration(
+                  hintText: 'Temukan restoran favorit kamu...',
+                ),
+                style: Theme.of(context).textTheme.bodyText1,
+                onFieldSubmitted: (query) => Get.toNamed(
+                  SearchResultScreen.routeName,
+                  arguments: SearchArguments(
+                    restaurants: _restaurants,
+                    query: query,
+                  ),
+                ),
+              )
+            : Text(
+                'Beranda',
+                style: Theme.of(context)
+                    .textTheme
+                    .headline5
+                    .copyWith(fontWeight: FontWeight.bold),
+              ),
         actions: [
           IconButton(
-            icon: Icon(FontAwesomeIcons.search),
-            onPressed: () {},
+            icon: Icon(
+              _searchMode ? FontAwesomeIcons.times : FontAwesomeIcons.search,
+            ),
+            onPressed: () {
+              if (_restaurants != null) {
+                setState(() {
+                  _searchMode = !_searchMode;
+                });
+              }
+            },
           ),
         ],
       ),
       body: StreamBuilder(
-        stream: Provider.of<RestaurantProvider>(context)
-            .restaurantUseCase
-            .getRestaurants(),
+        stream: Provider.of<RestaurantProvider>(context).streamRestaurants(),
         builder: (context, snapshot) {
           if (snapshot.hasData) {
-            List<RestaurantModel> _listRestaurant = snapshot.data;
+            _restaurants = snapshot.data;
 
             return SingleChildScrollView(
               child: Column(
@@ -45,72 +79,24 @@ class HomeScreen extends StatelessWidget {
                       fit: BoxFit.cover,
                     ),
                   ),
-                  ListTile(
-                    title: Text(
-                      'Restoran Populer',
-                      style: Theme.of(context)
-                          .textTheme
-                          .bodyText1
-                          .copyWith(fontWeight: FontWeight.bold),
-                    ),
-                    trailing: Text(
-                      'Lihat Semua',
-                      style: Theme.of(context).textTheme.bodyText2.copyWith(
-                            color: Colors.blueAccent,
-                            fontWeight: FontWeight.bold,
-                          ),
-                    ),
+                  _buildSectionTile(
+                    context,
+                    title: 'Restoran Populer',
+                    onTap: () {},
                   ),
-                  Container(
-                    height: 196,
-                    child: ListView.separated(
-                      itemBuilder: (context, index) {
-                        var _restaurant = _listRestaurant[index];
-                        return MiniRestaurantCard(restaurant: _restaurant);
-                      },
-                      separatorBuilder: (context, index) {
-                        return SizedBox(width: 8);
-                      },
-                      itemCount: _listRestaurant.length > 1
-                          ? _listRestaurant.length
-                          : 1,
-                      scrollDirection: Axis.horizontal,
-                      padding: EdgeInsets.symmetric(horizontal: 16),
-                    ),
+                  _buildRestaurantList(_sortByPopularity()),
+                  _buildSectionTile(
+                    context,
+                    title: 'Restoran Terdekat',
+                    onTap: () {},
                   ),
-                  ListTile(
-                    title: Text(
-                      'Restoran Terdekat',
-                      style: Theme.of(context)
-                          .textTheme
-                          .bodyText1
-                          .copyWith(fontWeight: FontWeight.bold),
-                    ),
-                    trailing: Text(
-                      'Lihat Semua',
-                      style: Theme.of(context).textTheme.bodyText2.copyWith(
-                            color: Colors.blueAccent,
-                            fontWeight: FontWeight.bold,
-                          ),
-                    ),
+                  _buildRestaurantList(_sortByDistance()),
+                  _buildSectionTile(
+                    context,
+                    title: 'Restoran Lainnya',
+                    onTap: () {},
                   ),
-                  Container(
-                    height: 196,
-                    child: ListView.separated(
-                      itemBuilder: (context, index) {
-                        var _restaurant = _listRestaurant[index];
-                        return MiniRestaurantCard(restaurant: _restaurant);
-                      },
-                      separatorBuilder: (context, index) {
-                        return SizedBox(width: 8);
-                      },
-                      itemCount: _listRestaurant.length > 1
-                          ? _listRestaurant.length
-                          : 1,
-                      scrollDirection: Axis.horizontal,
-                      padding: EdgeInsets.symmetric(horizontal: 16),
-                    ),
-                  ),
+                  _buildRestaurantList(_restaurants),
                 ],
               ),
             );
@@ -123,6 +109,83 @@ class HomeScreen extends StatelessWidget {
             );
           }
         },
+      ),
+    );
+  }
+
+  List<RestaurantModel> _sortByPopularity() {
+    List<RestaurantModel> _results = [];
+    _results.addAll(_restaurants);
+    _results.sort((a, b) => b.rating.compareTo(a.rating));
+    return _results;
+  }
+
+  List<RestaurantModel> _sortByDistance() {
+    var _pos = Helper.userPosition;
+    List<RestaurantModel> _results = [];
+    _results.addAll(_restaurants);
+    _results.sort((a, b) {
+      var _firstDistance = Geolocator.distanceBetween(
+        _pos.latitude,
+        _pos.longitude,
+        a.latitude,
+        a.longitude,
+      );
+
+      var _secondDistance = Geolocator.distanceBetween(
+        _pos.latitude,
+        _pos.longitude,
+        b.latitude,
+        b.longitude,
+      );
+
+      print('${a.name}: $_firstDistance m\n${b.name}: $_secondDistance m');
+
+      return _firstDistance.compareTo(_secondDistance);
+    });
+    return _results;
+  }
+
+  Container _buildRestaurantList(List<RestaurantModel> _listRestaurant) {
+    return Container(
+      height: 196,
+      child: ListView.separated(
+        itemBuilder: (context, index) {
+          var _restaurant = _listRestaurant[index];
+          return MiniRestaurantCard(restaurant: _restaurant);
+        },
+        separatorBuilder: (context, index) {
+          return SizedBox(width: 8);
+        },
+        itemCount: _listRestaurant.length > 1 ? _listRestaurant.length : 1,
+        scrollDirection: Axis.horizontal,
+        padding: EdgeInsets.symmetric(horizontal: 16),
+      ),
+    );
+  }
+
+  Widget _buildSectionTile(
+    BuildContext context, {
+    @required String title,
+    @required Function onTap,
+  }) {
+    return ListTile(
+      title: Text(
+        title,
+        style: Theme.of(context)
+            .textTheme
+            .bodyText1
+            .copyWith(fontWeight: FontWeight.bold),
+      ),
+      trailing: InkWell(
+        onTap: onTap,
+        child: Text(
+          'Lihat Semua',
+          style: Theme.of(context).textTheme.bodyText2.copyWith(
+                color: Colors.blueAccent,
+                fontWeight: FontWeight.bold,
+              ),
+        ),
       ),
     );
   }

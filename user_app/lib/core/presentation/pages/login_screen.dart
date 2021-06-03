@@ -6,7 +6,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 import 'package:resutoran_app/core/presentation/pages/register_screen.dart';
-import 'package:resutoran_app/core/presentation/provider/auth_provider.dart';
+import 'package:resutoran_app/core/presentation/providers/auth_provider.dart';
 
 class LoginScreen extends StatefulWidget {
   static const routeName = '/login';

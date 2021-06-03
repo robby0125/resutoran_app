@@ -13,8 +13,8 @@ import 'package:resutoran_app/core/domain/repositories/auth_repository.dart';
 import 'package:resutoran_app/core/domain/repositories/restaurant_repository.dart';
 import 'package:resutoran_app/core/domain/usecases/auth_usecase.dart';
 import 'package:resutoran_app/core/domain/usecases/restaurant_usecase.dart';
-import 'package:resutoran_app/core/presentation/provider/auth_provider.dart';
-import 'package:resutoran_app/core/presentation/provider/restaurant_provider.dart';
+import 'package:resutoran_app/core/presentation/providers/auth_provider.dart';
+import 'package:resutoran_app/core/presentation/providers/restaurant_provider.dart';
 
 class Injection {
   static Future<void> init() async {

@@ -9,13 +9,16 @@ import 'package:resutoran_app/core/presentation/pages/detail_screen.dart';
 import 'package:resutoran_app/core/presentation/pages/login_screen.dart';
 import 'package:resutoran_app/core/presentation/pages/main_screen.dart';
 import 'package:resutoran_app/core/presentation/pages/register_screen.dart';
-import 'package:resutoran_app/core/presentation/provider/auth_provider.dart';
-import 'package:resutoran_app/core/presentation/provider/restaurant_provider.dart';
+import 'package:resutoran_app/core/presentation/pages/search_result_screen.dart';
+import 'package:resutoran_app/core/presentation/providers/auth_provider.dart';
+import 'package:resutoran_app/core/presentation/providers/restaurant_provider.dart';
+import 'package:resutoran_app/util/helper.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
   await Injection.init();
+  await Helper.determinePosition();
   runApp(Resutoran());
 }
 
@@ -59,6 +62,9 @@ class Resutoran extends StatelessWidget {
           RegisterScreen.routeName: (_) => RegisterScreen(),
           DetailScreen.routeName: (context) => DetailScreen(
                 restaurant: ModalRoute.of(context).settings.arguments,
+              ),
+          SearchResultScreen.routeName: (context) => SearchResultScreen(
+                args: ModalRoute.of(context).settings.arguments,
               ),
         },
       ),
