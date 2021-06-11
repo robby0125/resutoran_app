@@ -1,5 +1,5 @@
 class UserEntity {
-  final String uid;
+  String uid;
   String displayName;
   String email;
   String photoUrl;

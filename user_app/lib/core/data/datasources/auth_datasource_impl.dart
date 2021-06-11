@@ -96,7 +96,7 @@ class AuthDataSourceImpl implements AuthDataSource {
       );
 
       final _user = _credential.user;
-      _user.updateProfile(displayName: name);
+      _user.updateDisplayName(name);
 
       return _resource.success(_provideUser(_user));
     } on FirebaseAuthException catch (e) {
@@ -114,9 +114,10 @@ class AuthDataSourceImpl implements AuthDataSource {
   }
 
   UserEntity _provideUser(User user) => UserEntity(
-        uid: user.uid,
+    uid: user.uid,
         displayName: user.displayName,
         email: user.email,
-        photoUrl: user.photoURL,
+        photoUrl: user.photoURL ??
+            'https://thumbs.dreamstime.com/b/default-avatar-profile-icon-vector-social-media-user-portrait-176256935.jpg',
       );
 }

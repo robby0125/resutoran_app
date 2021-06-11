@@ -8,7 +8,9 @@ import 'package:provider/provider.dart';
 import 'package:resutoran_app/core/data/models/restaurant_model.dart';
 import 'package:resutoran_app/core/presentation/pages/detail_screen.dart';
 import 'package:resutoran_app/core/presentation/pages/search_result_screen.dart';
-import 'package:resutoran_app/core/presentation/providers/restaurant_provider.dart';
+import 'package:resutoran_app/core/presentation/pages/show_all_restaurant_screen.dart';
+import 'package:resutoran_app/core/presentation/providers/firestore_provider.dart';
+import 'package:resutoran_app/core/presentation/widgets/section_tile_with_show_all.dart';
 import 'package:resutoran_app/util/helper.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -62,7 +64,7 @@ class _HomeScreenState extends State<HomeScreen> {
         ],
       ),
       body: StreamBuilder(
-        stream: Provider.of<RestaurantProvider>(context).streamRestaurants(),
+        stream: Provider.of<FirestoreProvider>(context).streamRestaurants(),
         builder: (context, snapshot) {
           if (snapshot.hasData) {
             _restaurants = snapshot.data;
@@ -79,23 +81,35 @@ class _HomeScreenState extends State<HomeScreen> {
                       fit: BoxFit.cover,
                     ),
                   ),
-                  _buildSectionTile(
-                    context,
-                    title: 'Restoran Populer',
-                    onTap: () {},
-                  ),
+                  SectionTileWithShowAll(
+                      title: 'Restoran Populer',
+                      onTap: () => Get.toNamed(
+                            ShowAllRestaurantScreen.routeName,
+                            arguments: ShowAllRestaurantArgs(
+                              title: 'Restoran Populer',
+                              restaurants: _sortByPopularity(),
+                            ),
+                          )),
                   _buildRestaurantList(_sortByPopularity()),
-                  _buildSectionTile(
-                    context,
-                    title: 'Restoran Terdekat',
-                    onTap: () {},
-                  ),
+                  SectionTileWithShowAll(
+                      title: 'Restoran Terdekat',
+                      onTap: () => Get.toNamed(
+                            ShowAllRestaurantScreen.routeName,
+                            arguments: ShowAllRestaurantArgs(
+                              title: 'Restoran Terdekat',
+                              restaurants: _sortByDistance(),
+                            ),
+                          )),
                   _buildRestaurantList(_sortByDistance()),
-                  _buildSectionTile(
-                    context,
-                    title: 'Restoran Lainnya',
-                    onTap: () {},
-                  ),
+                  SectionTileWithShowAll(
+                      title: 'Restoran Lainnya',
+                      onTap: () => Get.toNamed(
+                            ShowAllRestaurantScreen.routeName,
+                            arguments: ShowAllRestaurantArgs(
+                              title: 'Restoran Lainnya',
+                              restaurants: _restaurants,
+                            ),
+                          )),
                   _buildRestaurantList(_restaurants),
                 ],
               ),
@@ -160,32 +174,6 @@ class _HomeScreenState extends State<HomeScreen> {
         itemCount: _listRestaurant.length > 1 ? _listRestaurant.length : 1,
         scrollDirection: Axis.horizontal,
         padding: EdgeInsets.symmetric(horizontal: 16),
-      ),
-    );
-  }
-
-  Widget _buildSectionTile(
-    BuildContext context, {
-    @required String title,
-    @required Function onTap,
-  }) {
-    return ListTile(
-      title: Text(
-        title,
-        style: Theme.of(context)
-            .textTheme
-            .bodyText1
-            .copyWith(fontWeight: FontWeight.bold),
-      ),
-      trailing: InkWell(
-        onTap: onTap,
-        child: Text(
-          'Lihat Semua',
-          style: Theme.of(context).textTheme.bodyText2.copyWith(
-                color: Colors.blueAccent,
-                fontWeight: FontWeight.bold,
-              ),
-        ),
       ),
     );
   }

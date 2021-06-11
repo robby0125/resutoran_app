@@ -1,21 +1,23 @@
 abstract class RestaurantEntity {
-  String get name;
+  final String name;
+  final String description;
+  final String pictures;
+  final double rating;
+  final double latitude;
+  final double longitude;
+  final List<Map<String, dynamic>> drinks;
+  final List<Map<String, dynamic>> foods;
+  final List<Map<String, dynamic>> reviews;
 
-  String get description;
-
-  String get pictures;
-
-  double get rating;
-
-  double get latitude;
-
-  double get longitude;
-
-  List<int> get categoryIds;
-
-  List<Map<String, dynamic>> get drinks;
-
-  List<Map<String, dynamic>> get foods;
-
-  List<Map<String, dynamic>> get reviews;
+  RestaurantEntity({
+    this.name,
+    this.description,
+    this.pictures,
+    this.rating,
+    this.latitude,
+    this.longitude,
+    this.drinks,
+    this.foods,
+    this.reviews,
+  });
 }

@@ -5,13 +5,15 @@ import 'package:provider/provider.dart';
 import 'package:responsive_framework/responsive_framework.dart';
 import 'package:resutoran_app/common/style.dart';
 import 'package:resutoran_app/core/di/injection.dart';
+import 'package:resutoran_app/core/presentation/pages/all_review_screen.dart';
 import 'package:resutoran_app/core/presentation/pages/detail_screen.dart';
 import 'package:resutoran_app/core/presentation/pages/login_screen.dart';
 import 'package:resutoran_app/core/presentation/pages/main_screen.dart';
 import 'package:resutoran_app/core/presentation/pages/register_screen.dart';
 import 'package:resutoran_app/core/presentation/pages/search_result_screen.dart';
+import 'package:resutoran_app/core/presentation/pages/show_all_restaurant_screen.dart';
 import 'package:resutoran_app/core/presentation/providers/auth_provider.dart';
-import 'package:resutoran_app/core/presentation/providers/restaurant_provider.dart';
+import 'package:resutoran_app/core/presentation/providers/firestore_provider.dart';
 import 'package:resutoran_app/util/helper.dart';
 
 void main() async {
@@ -28,7 +30,7 @@ class Resutoran extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(
-          create: (_) => Get.find<RestaurantProvider>(),
+          create: (_) => Get.find<FirestoreProvider>(),
         ),
         ChangeNotifierProvider(
           create: (_) => Get.find<AuthProvider>(),
@@ -64,6 +66,13 @@ class Resutoran extends StatelessWidget {
                 restaurant: ModalRoute.of(context).settings.arguments,
               ),
           SearchResultScreen.routeName: (context) => SearchResultScreen(
+                args: ModalRoute.of(context).settings.arguments,
+              ),
+          ShowAllRestaurantScreen.routeName: (context) =>
+              ShowAllRestaurantScreen(
+                args: ModalRoute.of(context).settings.arguments,
+              ),
+          AllReviewScreen.routeName: (context) => AllReviewScreen(
                 args: ModalRoute.of(context).settings.arguments,
               ),
         },

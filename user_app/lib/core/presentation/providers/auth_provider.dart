@@ -4,12 +4,17 @@ import 'package:get/get.dart';
 import 'package:resutoran_app/core/domain/entities/user_entity.dart';
 import 'package:resutoran_app/core/domain/resource.dart';
 import 'package:resutoran_app/core/domain/usecases/auth_usecase.dart';
+import 'package:resutoran_app/core/domain/usecases/firestore_usecase.dart';
 import 'package:resutoran_app/core/presentation/pages/main_screen.dart';
 
 class AuthProvider extends ChangeNotifier {
   final AuthUseCase _authUseCase;
+  final FirestoreUseCase _firestoreUseCase;
 
-  AuthProvider(this._authUseCase);
+  AuthProvider(
+    this._authUseCase,
+    this._firestoreUseCase,
+  );
 
   ConnectionState _state;
 
@@ -35,7 +40,10 @@ class AuthProvider extends ChangeNotifier {
   ) async {
     _loading();
     final _resource = await _authUseCase.registerWithEmail(name, email, pass);
-    _handleResult(_resource);
+    if (_resource.body != null)
+      loginWithEmail(email, pass);
+    else
+      _handleResult(_resource);
   }
 
   Future<void> loginWithFacebook() async {
@@ -72,6 +80,8 @@ class AuthProvider extends ChangeNotifier {
       notifyListeners();
 
       _user = _resource.body;
+
+      _firestoreUseCase.addRegisteredUser(_user);
 
       Get.offAllNamed(MainScreen.routeName);
     } else {

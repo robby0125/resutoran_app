@@ -4,6 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:resutoran_app/core/data/models/restaurant_model.dart';
+import 'package:resutoran_app/core/presentation/pages/all_review_screen.dart';
+import 'package:resutoran_app/core/presentation/widgets/review_item.dart';
+import 'package:resutoran_app/core/presentation/widgets/section_tile_with_show_all.dart';
 import 'package:resutoran_app/util/helper.dart';
 
 class DetailScreen extends StatelessWidget {
@@ -69,21 +72,20 @@ class DetailScreen extends StatelessWidget {
                           FontAwesomeIcons.mapMarkerAlt,
                           color: Colors.red,
                         ),
-                        SizedBox(width: 4),
                         FutureBuilder(
-                          future: Helper.getCityFromLatLong(GeoPoint(
+                          future: Helper.getFullAddressFromLatLong(GeoPoint(
                             restaurant.latitude,
                             restaurant.longitude,
                           )),
                           builder: (context, snapshot) => Padding(
                             padding: EdgeInsets.symmetric(horizontal: 8),
                             child: Text(
-                              snapshot.data ?? 'Loading City',
+                              snapshot.data ?? 'Loading Address..',
                               style: Theme.of(context)
                                   .textTheme
                                   .bodyText1
-                                  .copyWith(color: Colors.black54),
-                              maxLines: 1,
+                                  .copyWith(color: Colors.black87),
+                              maxLines: 2,
                               overflow: TextOverflow.ellipsis,
                             ),
                           ),
@@ -196,21 +198,15 @@ class DetailScreen extends StatelessWidget {
                     thickness: 2,
                     height: 24,
                   ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        'Ulasan',
-                        style: Theme.of(context)
-                            .textTheme
-                            .headline6
-                            .copyWith(fontWeight: FontWeight.bold),
+                  SectionTileWithShowAll(
+                    title: 'Ulasan',
+                    onTap: () => Get.toNamed(
+                      AllReviewScreen.routeName,
+                      arguments: AllReviewArgs(
+                        restaurantName: restaurant.name,
+                        reviews: restaurant.reviews,
                       ),
-                      TextButton(
-                        onPressed: () {},
-                        child: Text('Lihat Semua'),
-                      ),
-                    ],
+                    ),
                   ),
                   Column(
                     mainAxisSize: MainAxisSize.min,
@@ -222,9 +218,9 @@ class DetailScreen extends StatelessWidget {
 
                       return Padding(
                         padding: EdgeInsets.only(bottom: index < 2 ? 8 : 0),
-                        child: _buildReviewItem(
-                          context,
-                          userName: 'User Anonym',
+                        child: ReviewItem(
+                          photoUrl: _review['photoUrl'],
+                          userName: _review['displayName'],
                           userReview: _review['review'],
                           rating: _review['rate'],
                         ),
@@ -236,48 +232,6 @@ class DetailScreen extends StatelessWidget {
             ),
           ],
         ),
-      ),
-    );
-  }
-
-  Widget _buildReviewItem(
-    BuildContext context, {
-    @required String userName,
-    @required String userReview,
-    @required int rating,
-  }) {
-    return ListTile(
-      title: Text(
-        userName,
-        style: Theme.of(context)
-            .textTheme
-            .headline6
-            .copyWith(fontWeight: FontWeight.bold),
-      ),
-      subtitle: Text(
-        userReview,
-        style: Theme.of(context).textTheme.bodyText1,
-      ),
-      leading: CircleAvatar(
-        radius: 50,
-      ),
-      trailing: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(
-            FontAwesomeIcons.solidStar,
-            color: Colors.orangeAccent,
-            size: 16,
-          ),
-          SizedBox(width: 8),
-          Text(
-            rating.toString(),
-            style: Theme.of(context)
-                .textTheme
-                .bodyText1
-                .copyWith(fontWeight: FontWeight.bold),
-          ),
-        ],
       ),
     );
   }
